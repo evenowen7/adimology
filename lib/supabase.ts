@@ -1,9 +1,32 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl =
+  process.env.SIM_SUPABASE_URL ||
+  process.env.SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseServerKey =
+  process.env.SIM_SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_KEY;
+
+if (!supabaseUrl) {
+  throw new Error('Supabase URL is not configured');
+}
+
+if (!supabaseServerKey) {
+  throw new Error('Supabase server key is not configured');
+}
+
+export const supabase = createClient(
+  supabaseUrl,
+  supabaseServerKey,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
+);
 
 /**
  * Save stock query to database
